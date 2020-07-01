@@ -10,17 +10,18 @@ const authReducer = (state = initState, action) => {
         case "CHECK_LOGIN":
             let check = state.student.filter((data) => {
                 if(data.email === action.loginData.email && data.password === action.loginData.password){
-                    
                     return data;
                 }
+                return false;
             });
+            console.log("checkAyuth: ", state.student);
             localStorage.setItem('authData', JSON.stringify(check))
             return {
                 ...state,
                 authData: check,
                 student: state.student
-            };
-            break;
+            }; 
+        
         case "END_LOGIN":
             localStorage.setItem('authData', null)
             return {
@@ -28,10 +29,8 @@ const authReducer = (state = initState, action) => {
                 authData: [],
                 student: state.student
             };
-            break;
         default:
           return newState;
-          break;
         }
 }
 

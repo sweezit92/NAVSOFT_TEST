@@ -1,13 +1,13 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { StudentAction } from '../../Store/Actions/studentAction';
+import { UpdateStudent } from '../../Store/Actions/studentAction';
 
 const validEmailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const validPhoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
 
-const validPassRegex=  /^[A-Za-z]\w{7,14}$/;
+const validPassRegex = /^[A-Za-z]\w{7,14}$/;
 
 const validateForm = (errors) => {
     let valid = true;
@@ -19,7 +19,7 @@ const validateForm = (errors) => {
     return valid;
 }
 
-class SignUp extends Component {
+export class EditDetails extends Component {
 
     state = {
         errors: {
@@ -36,18 +36,7 @@ class SignUp extends Component {
             password: '',
             conPassword: ''
         },
-        firstName: '',
-        lastName: '',
-        email: '',
-        checkEmail: '',
-        phone: '',
-        address: '',
-        dateOfBirth: '',
-        degree: '',
-        skills: [],
-        experience: '',
-        password: '',
-        conPassword: ''
+        skills: []
     }
 
     handleChange = (e) => {
@@ -55,7 +44,7 @@ class SignUp extends Component {
         let value = e.target.value;
         let errors = this.state.errors;
 
-        if(name === 'skills'){
+        if (name === 'skills') {
             let newVal = [];
             let options = e.target.options;
             for (var i = 0, l = options.length; i < l; i++) {
@@ -78,25 +67,25 @@ class SignUp extends Component {
             }
         }
 
-        if(name === 'email'){
+        if (name === 'email') {
             let allData = JSON.parse(localStorage.getItem('student'));
             let emailStatus;
-            if(localStorage.getItem('student') !== null){
-                emailStatus = allData.filter((data)=>{
-                    if(data.email === value){
+            if (localStorage.getItem('student') !== null) {
+                emailStatus = allData.filter((data) => {
+                    if (data.email === value) {
                         return true
-                    }else{
+                    } else {
                         return false
                     }
                 })
-            }else{
+            } else {
                 emailStatus = false;
             }
-            
-            
-            if(validEmailRegex.test(value) !== true){
+
+
+            if (validEmailRegex.test(value) !== true) {
                 errors.email = 'Email is not valid!';
-            }else if(emailStatus === true){
+            } else if (emailStatus === true) {
                 errors.checkEmail = 'Email is already exist';
             }
             console.log("emailerror: ", errors.email);
@@ -117,11 +106,11 @@ class SignUp extends Component {
                 break;
             case 'email':
                 errors.email =
-                    validEmailRegex.test(value) 
+                    validEmailRegex.test(value)
                         ? ''
-                        : 'Email is not valid!';  
+                        : 'Email is not valid!';
                 break;
-           
+
             case 'phone':
                 errors.phone =
                     value.match(validPhoneRegex)
@@ -158,7 +147,7 @@ class SignUp extends Component {
                         ? ''
                         : 'Password should  minimum 8 long, which contain only characters, numeric digits, underscore and first character must be a letter';
                 break;
-                
+
             case 'conPassword':
                 errors.conPassword =
                     this.state.password === value
@@ -168,8 +157,8 @@ class SignUp extends Component {
             default:
                 break;
         }
-        if(name!== 'skills'){
-            this.setState({errors, [name]: value}, ()=> {
+        if (name !== 'skills') {
+            this.setState({ errors, [name]: value }, () => {
                 console.log(value.length)
             })
         }
@@ -177,31 +166,47 @@ class SignUp extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
+        
         if (validateForm(this.state.errors)) {
-            this.props.addStudent(this.state);
-            this.props.changePage("login");
+            this.props.upStudent(this.state);
+            this.props.checkStat("table");
         }
     }
 
+     componentDidMount(){
+        this.setState({
+            firstName: this.props.editStatus[0].firstName,
+            lastName: this.props.editStatus[0].lastName,
+            email: this.props.editStatus[0].email,
+            phone: this.props.editStatus[0].phone,
+            address: this.props.editStatus[0].address,
+            dateOfBirth: this.props.editStatus[0].dateOfBirth,
+            degree: this.props.editStatus[0].degree,
+            skills: this.props.editStatus[0].skills,
+            experience: this.props.editStatus[0].experience,
+            password: this.props.editStatus[0].password
+         })
+     }
+
     render() {
         const { errors } = this.state;
-        console.log("name :", this.state.firstName);
+        //const editStatus = this.props.editStatus[0];
         return (
             <div className="row shiftCenter-signUp" >
                 <div className="col-md-8">
                     <div className="card" >
                         <div className="card-header">
-                            SignIn
-                            </div>
+                            Edit Details
+                        </div>
                         <div className="card-body" style={{ textAlign: "left" }}>
                             <form onSubmit={this.handleSubmit}>
                                 <div className="form-row">
                                     <div className="col">
                                         <div className="form-group">
                                             <label>First Name</label>
-                                            <input type="text" name="firstName" value={ this.state.firstName} onChange={this.handleChange} className="form-control" />
+                                            <input type="text" name="firstName" value={this.state.firstName} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.firstName.length > 0 && 
+                                                errors.firstName.length > 0 &&
                                                 <span className='error'>{errors.firstName}</span>
                                             }
                                         </div>
@@ -209,9 +214,9 @@ class SignUp extends Component {
                                     <div className="col">
                                         <div className="form-group">
                                             <label>Last Name</label>
-                                            <input type="text" name="lastName" value={ this.state.lastName } onChange={this.handleChange} className="form-control" />
+                                            <input type="text" name="lastName" value={this.state.lastName} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.lastName.length > 0 && 
+                                                errors.lastName.length > 0 &&
                                                 <span className='error'>{errors.lastName}</span>
                                             }
                                         </div>
@@ -223,11 +228,11 @@ class SignUp extends Component {
                                             <label>Email</label>
                                             <input type="email" name="email" value={this.state.email} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.email !== ''  && 
+                                                errors.email !== '' &&
                                                 <span className='error'>{errors.email}</span>
                                             }
                                             {
-                                                errors.checkEmail !=='' &&
+                                                errors.checkEmail !== '' &&
                                                 <span className='error'>{errors.checkEmail}</span>
                                             }
                                         </div>
@@ -237,7 +242,7 @@ class SignUp extends Component {
                                             <label>Phone</label>
                                             <input type="number" name="phone" value={this.state.phone} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.phone.length > 0 && 
+                                                errors.phone.length > 0 &&
                                                 <span className='error'>{errors.phone}</span>
                                             }
                                         </div>
@@ -250,20 +255,20 @@ class SignUp extends Component {
                                             <textarea className="form-control" name="address" value={this.state.address} onChange={this.handleChange} rows="3">
                                             </textarea>
                                             {
-                                                errors.address.length > 0 && 
+                                                errors.address.length > 0 &&
                                                 <span className='error'>{errors.address}</span>
                                             }
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div className="form-row">
                                     <div className="col">
                                         <div className="form-group">
                                             <label>Date Of Birth</label>
                                             <input type="date" name="dateOfBirth" value={this.state.dateOfBirth} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.dateOfBirth.length > 0 && 
+                                                errors.dateOfBirth.length > 0 &&
                                                 <span className='error'>{errors.dateOfBirth}</span>
                                             }
                                         </div>
@@ -273,7 +278,7 @@ class SignUp extends Component {
                                             <label>Degree of Graduation</label>
                                             <input type="text" name="degree" value={this.state.degree} onChange={this.handleChange} className="form-control" />
                                             {
-                                                errors.degree.length > 0 && 
+                                                errors.degree.length > 0 &&
                                                 <span className='error'>{errors.degree}</span>
                                             }
                                         </div>
@@ -284,14 +289,14 @@ class SignUp extends Component {
                                         <div className="form-group">
                                             <label>Skills</label>
                                             <select multiple className="form-control" name="skills" onChange={this.handleChange}>
-                                                <option value="C" selected={(this.state.skills === 'C')? true : false}>C</option>
-                                                <option value="Dot Net" selected={(this.state.skills === 'Dot Net')? true : false} onChange={this.handleChange}>Dot Net</option>
-                                                <option value="Javascript" selected={(this.state.skills === 'Javascript')? true : false}>Javascript</option>
-                                                <option value="PHP" selected={(this.state.skills === 'PHP')? true : false}>PHP</option>
-                                                <option value="Python" selected={(this.state.skills === 'Python')? true : false}>Python</option>
+                                                <option value="C" selected={(this.state.skills.includes("C")) ? true : false}>C</option>
+                                                <option value="Dot Net" selected={(this.state.skills.includes("Dot Net")) ? true : false} onChange={this.handleChange}>Dot Net</option>
+                                                <option value="Javascript" selected={(this.state.skills.includes("Javascript")) ? true : false}>Javascript</option>
+                                                <option value="PHP" selected={(this.state.skills.includes("PHP")) ? true : false}>PHP</option>
+                                                <option value="Python" selected={(this.state.skills.includes("Python")) ? true : false}>Python</option>
                                             </select>
                                             {
-                                                errors.skills.length > 0 && 
+                                                errors.skills.length > 0 &&
                                                 <span className='error'>{errors.skills}</span>
                                             }
                                         </div>
@@ -300,44 +305,21 @@ class SignUp extends Component {
                                         <div className="form-group">
                                             <label>Experience</label>
                                             <select className="form-control" name="experience" onChange={this.handleChange}>
-                                                <option value="0" selected={(this.state.experience === '0')? true : false}>0</option>
-                                                <option value="1" selected={(this.state.experience === '1')? true : false}>1</option>
-                                                <option value="2" selected={(this.state.experience === '2')? true : false}>2</option>
-                                                <option value="3" selected={(this.state.experience === '3')? true : false}>3</option>
-                                                <option value="4" selected={(this.state.experience === '4')? true : false}>4</option>
-                                                <option value="5" selected={(this.state.experience === '5')? true : false}>5</option>
+                                                <option value="0" selected={(this.state.experience === '0') ? true : false}>0</option>
+                                                <option value="1" selected={(this.state.experience === '1') ? true : false}>1</option>
+                                                <option value="2" selected={(this.state.experience === '2') ? true : false}>2</option>
+                                                <option value="3" selected={(this.state.experience === '3') ? true : false}>3</option>
+                                                <option value="4" selected={(this.state.experience === '4') ? true : false}>4</option>
+                                                <option value="5" selected={(this.state.experience === '5') ? true : false}>5</option>
                                             </select>
                                             {
-                                                errors.experience.length > 0 && 
+                                                errors.experience.length > 0 &&
                                                 <span className='error'>{errors.experience}</span>
                                             }
                                         </div>
                                     </div>
                                 </div>
-                                <div className="form-row" >
-                                        <div className="col">
-                                            <div className="form-group">
-                                                <label>Password</label>
-                                                <input type="password" name="password" onChange={this.handleChange} className="form-control" />
-                                                {
-                                                    errors.password.length > 0 && 
-                                                    <span className='error'>{errors.password}</span>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className="col">
-                                            <div className="form-group">
-                                                <label>Confirm Password</label>
-                                                <input type="password" name="conPassword" onChange={this.handleChange} className="form-control" />
-                                                {
-                                                    errors.conPassword.length > 0 && 
-                                                    <span className='error'>{errors.conPassword}</span>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                
-                                <button className="btn btn-primary btn-block">Sign Up</button>
+                                <button className="btn btn-primary btn-block">Update Data</button>
                             </form>
                         </div>
                     </div>
@@ -349,13 +331,15 @@ class SignUp extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        student: state.student.student
+        student: state.student.student,
+        editStatus: state.student.editStatus
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addStudent: (student) => dispatch(StudentAction(student))
+        upStudent: (updataData) => dispatch(UpdateStudent(updataData))
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(SignUp)
+export default connect(mapStateToProps, mapDispatchToProps)(EditDetails)
+

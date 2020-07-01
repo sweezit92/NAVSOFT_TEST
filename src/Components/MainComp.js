@@ -8,9 +8,19 @@ import { AuthLogout } from '../Store/Actions/authAction'
 
 class MainComp extends Component {
 
+    state = {
+        pageStatus: "login"
+    }
+
     logoutUser = (e) => {
         e.preventDefault();
         this.props.logOut();
+    }
+
+    changeState = (pageStatus) => {
+        this.setState({
+            pageStatus
+        })
     }
 
     render() {
@@ -20,19 +30,25 @@ class MainComp extends Component {
                 {
                     this.props.authData.length > 0 
                     ?
-                    <>
-                    <h5 style={{marginTop: "20px"}}>Hello {this.props.authData[0].firstName} {this.props.authData[0].lastName}</h5>
-                    <button className="btn btn-danger" onClick={this.logoutUser}>Logout</button>
-                    <SignUp />
                     <Table />
-                    </>
                     :
                     <>
-                    <SignUp />
-                    <h5 style={{marginTop: "20px"}}>OR</h5>
-                    <Login />
+                    {
+                        this.state.pageStatus === "login"
+                        ?
+                        <>
+                        <Login />
+                        <h5 style={{marginTop: "20px"}}>Don't have an acoount? <span style={{cursor: "pointer", color: "#007bff"}} onClick={()=> this.changeState("signUp")}>Sign Up</span> Now</h5>
+                        </>
+                        :
+                        <>
+                        <SignUp changePage={this.changeState}/>
+                        <h5 style={{marginTop: "20px"}}>Have an acoount? <span style={{cursor: "pointer", color: "#007bff"}} onClick={()=> this.changeState("login")}>Login</span> to your account</h5>
+                        </>
+                    }
                     </>
                 }
+                    
             </div>
         )
     }

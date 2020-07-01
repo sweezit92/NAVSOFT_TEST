@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { AuthAction } from '../../Store/Actions/authAction';
@@ -6,16 +7,6 @@ const validEmailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const validPassRegex=  /^[A-Za-z]\w{7,14}$/;
 
-const validateForm = (errors) => {
-    let valid = true;
-    Object.values(errors).forEach(
-        // if we have an error string set valid to false
-        (val) => val.length > 0 && (valid = false)
-    );
-    //console.log("errors :", valid);
-    return valid;
-}
-
 class Login extends Component {
     state= {
         email: '',
@@ -23,14 +14,14 @@ class Login extends Component {
         errors: {
             email: '',
             password: ''
-        }
+        },
+        btnState: false
     }
 
     handleChange = (e) => {
         let errors = this.state.errors;
         let name = e.target.name;
         let value = e.target.value;
-        console.log("ded :", value);
         switch (name) {
             case 'email':
                 errors.email =
@@ -55,6 +46,9 @@ class Login extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.authLogin(this.state);
+        this.setState({
+            btnState: true
+        })
     }
 
     render() {
@@ -62,6 +56,13 @@ class Login extends Component {
         return (
             <div className="row shiftCenter" >
                 <div className="col-md-5">
+                    {
+                         this.props.authData.length < 1 && this.state.btnState === true &&
+                         <div class="alert alert-danger">
+                            <strong>Login Failed!</strong> 
+                        </div>
+                    }
+                
                     <div className="card">
                         <div className="card-header">
                             Login
@@ -84,7 +85,7 @@ class Login extends Component {
                                         <span className='error'>{errors.password}</span>
                                     }
                                 </div>
-                                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                                <button type="submit" className="btn btn-primary btn-block">Login</button>
                             </form>
                         </div>
                     </div>

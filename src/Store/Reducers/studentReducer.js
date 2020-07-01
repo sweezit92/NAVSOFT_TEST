@@ -1,17 +1,20 @@
 const initState = {
     student: ((JSON.parse(localStorage.getItem('student')) === null)? [] : JSON.parse(localStorage.getItem('student'))),
     editStatus: ((JSON.parse(localStorage.getItem('editStatus')) === null)? [] : JSON.parse(localStorage.getItem('editStatus'))),
+    authData: ((JSON.parse(localStorage.getItem('authData')) === null)? [] : JSON.parse(localStorage.getItem('authData'))),
 };
 
 const studentReducer = (state = initState, action) => {
     const newState = {...state};
     switch (action.type) {
         case "ADD_STUDENT":
-          localStorage.setItem('student', JSON.stringify(state.student.concat(action.student)))
+          state.student.push(action.student)
+          localStorage.setItem('student', JSON.stringify(state.student))
           return {
             ...state,
-            student: state.student.concat(action.student),
-            editStatus: state.editStatus
+            student: state.student,
+            editStatus: state.editStatus,
+            suthData: state.authData
           };
         case "DELETE_STUDENT":
             let newAr = state.student.filter((data)=> {
@@ -21,19 +24,22 @@ const studentReducer = (state = initState, action) => {
             return {
                 ...state,
                 student: newAr,
-                editStatus: state.editStatus
+                editStatus: state.editStatus,
+                suthData: state.authData
               };
         case "EDIT_STUDENT":
             let editArr = state.student.filter((data)=> {
                 if(data.email === action.editStatus.email) {
                     return data;
                 }
+                return false;
             })
             localStorage.setItem('editStatus', JSON.stringify(editArr))
             return {
                 ...state,
                 student: state.student,
-                editStatus: editArr
+                editStatus: editArr,
+                suthData: state.authData
               };
         case "UPDATE_STUDENT":
             let newObc = {
@@ -45,14 +51,15 @@ const studentReducer = (state = initState, action) => {
                 dateOfBirth : action.updateData.dateOfBirth,
                 degree : action.updateData.degree,
                 skills : action.updateData.skills,
-                experience : action.updateData.experience
+                experience : action.updateData.experience,
+                password : action.updateData.password
             };
-            const newD = state.student.map((data, index) => {
+            state.student.map((data, index) => {
                 if(data.email === newObc.email){
                     state.student[index] = newObc;
                     return true;
                 }
-                 
+                 return false;
             })
             
             console.log("new :", state.student);
@@ -61,7 +68,8 @@ const studentReducer = (state = initState, action) => {
             return {
                 ...state,
                 student: JSON.parse(localStorage.getItem('student')),
-                editStatus: state.editStatus
+                editStatus: state.editStatus,
+                suthData: state.authData
               };
         default:
           return newState;
